@@ -23,4 +23,8 @@ dependencies {
     implementation("io.ktor:ktor-server-netty:$ktor_version")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     testImplementation("io.ktor:ktor-server-tests:$ktor_version")
+
+    implementation("org.jetbrains.exposed:exposed:0.17.13")
+    implementation("com.zaxxer", "HikariCP", "3.2.0")
+    runtimeOnly("org.postgresql", "postgresql", "42.2.20")
 }

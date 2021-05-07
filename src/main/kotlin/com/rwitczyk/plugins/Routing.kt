@@ -1,26 +1,35 @@
 package com.rwitczyk.plugins
 
-import com.rwitczyk.UserController
-import com.rwitczyk.domains.UserDTO
+import com.rwitczyk.UserService
+import com.rwitczyk.dto.UpdateUserDataDTO
+import com.rwitczyk.dto.UserDTO
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import java.util.*
 
 fun Application.configureRouting() {
 
-    val userController = UserController();
+    val userService = UserService();
 
     routing {
         get("/") {
             call.respondText("Hello World!")
         }
 
-        post("/user") {
+        post("/users") {
             val userDto = call.receive<UserDTO>()
-            userController.insert(userDto);
+            userService.addUserAccount(userDto);
             call.respond(HttpStatusCode.Created)
+        }
+
+        put("/users/{id}") {
+            val id: UUID = UUID.fromString(call.parameters["id"])
+            val userDto = call.receive<UpdateUserDataDTO>()
+            userService.updateUserData(userDto, id);
+            call.respond(HttpStatusCode.OK)
         }
     }
 }

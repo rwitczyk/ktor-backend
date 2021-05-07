@@ -26,5 +26,6 @@ dependencies {
 
     implementation("org.jetbrains.exposed:exposed:0.17.13")
     implementation("com.zaxxer", "HikariCP", "3.2.0")
+    implementation("org.mindrot", "jbcrypt", "0.4")
     runtimeOnly("org.postgresql", "postgresql", "42.2.20")
 }

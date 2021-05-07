@@ -1,6 +1,7 @@
 package com.rwitczyk.plugins
 
 import com.rwitczyk.UserService
+import com.rwitczyk.dto.LoginUserDTO
 import com.rwitczyk.dto.UpdateUserDataDTO
 import com.rwitczyk.dto.UserDTO
 import io.ktor.application.*
@@ -17,6 +18,12 @@ fun Application.configureRouting() {
     routing {
         get("/") {
             call.respondText("Hello World!")
+        }
+
+        post("/login") {
+            val userLoginDTO = call.receive<LoginUserDTO>()
+            userService.login(userLoginDTO)
+            call.respond(HttpStatusCode.OK)
         }
 
         post("/users") {

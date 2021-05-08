@@ -1,12 +1,10 @@
 package com.rwitczyk;
 
 import com.rwitczyk.domains.Users
-import com.rwitczyk.dto.EditUserPasswordDTO
-import com.rwitczyk.dto.LoginUserDTO
-import com.rwitczyk.dto.UpdateUserDataDTO
-import com.rwitczyk.dto.UserDTO
+import com.rwitczyk.dto.*
 import com.rwitczyk.utils.PasswordValidator
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
@@ -14,6 +12,7 @@ import org.mindrot.jbcrypt.BCrypt
 import java.util.*
 
 class UserService {
+    val passwordValidator = PasswordValidator();
 
     fun login(userLoginDTO: LoginUserDTO): String {
         var userId = "";
@@ -38,7 +37,6 @@ class UserService {
             throw Throwable("User already exists, login: " + user.login)
         }
 
-        val passwordValidator = PasswordValidator();
         if (!passwordValidator.isPasswordStrongEnough(user.password)) {
             throw Throwable("Password weak: " + user.password)
         }
@@ -79,7 +77,26 @@ class UserService {
         }
     }
 
+    fun getUserData(id: UUID): UserDataDTO {
+        val userData: UserDataDTO = UserDataDTO("", "", "", 0);
+
+        transaction {
+            Users.select { Users.id eq id }.forEach {
+                userData.login = it[Users.login]
+                userData.firstName = it[Users.firstname]
+                userData.lastName = it[Users.lastname]
+                userData.age = it[Users.age]
+            }
+        }
+
+        return userData;
+    }
+
     fun editUserPassword(editUserPasswordDTO: EditUserPasswordDTO, id: UUID) {
+        if (!passwordValidator.isPasswordStrongEnough(editUserPasswordDTO.password)) {
+            throw Throwable("Password weak: " + editUserPasswordDTO.password)
+        }
+
         transaction {
             Users.update({ Users.id eq id }) {
                 it[password] = BCrypt.hashpw(editUserPasswordDTO.password, BCrypt.gensalt())

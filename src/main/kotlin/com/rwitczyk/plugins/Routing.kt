@@ -17,12 +17,11 @@ fun Application.configureRouting() {
     val userService = UserService();
 
     routing {
-        put("/editPassword/{id}") {
+        post("/editPassword/{id}") {
             val id: UUID = UUID.fromString(call.parameters["id"])
             val editUserPasswordDTO = call.receive<EditUserPasswordDTO>()
             userService.editUserPassword(editUserPasswordDTO, id)
             call.respond(HttpStatusCode.OK)
-
         }
 
         post("/login") {
@@ -37,11 +36,17 @@ fun Application.configureRouting() {
             call.respond(HttpStatusCode.Created)
         }
 
-        put("/users/{id}") {
+        post("/users/{id}") {
             val id: UUID = UUID.fromString(call.parameters["id"])
             val userDto = call.receive<UpdateUserDataDTO>()
             userService.updateUserData(userDto, id);
             call.respond(HttpStatusCode.OK)
+        }
+
+        get("/users/{id}") {
+            val id: UUID = UUID.fromString(call.parameters["id"])
+            val userData = userService.getUserData(id);
+            call.respond(HttpStatusCode.OK, userData)
         }
     }
 }

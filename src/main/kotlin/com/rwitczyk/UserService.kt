@@ -1,5 +1,6 @@
 package com.rwitczyk;
 
+import com.rwitczyk.domains.Things
 import com.rwitczyk.domains.Users
 import com.rwitczyk.dto.*
 import com.rwitczyk.utils.PasswordValidator
@@ -42,13 +43,32 @@ class UserService {
         }
 
         transaction {
+            val usersId = UUID.randomUUID()
             Users.insert {
-                it[id] = UUID.randomUUID()
+                it[id] = usersId
                 it[login] = user.login
                 it[password] = BCrypt.hashpw(user.password, BCrypt.gensalt())
                 it[age] = user.age
                 it[firstname] = user.firstName
                 it[lastname] = user.lastName
+            }
+
+            Things.insert {
+                it[id] = UUID.randomUUID()
+                it[name] = "Telewizor"
+                it[userId] = usersId
+            }
+
+            Things.insert {
+                it[id] = UUID.randomUUID()
+                it[name] = "Mikrofon"
+                it[userId] = usersId
+            }
+
+            Things.insert {
+                it[id] = UUID.randomUUID()
+                it[name] = "Widelec"
+                it[userId] = usersId
             }
         }
     }
@@ -102,5 +122,20 @@ class UserService {
                 it[password] = BCrypt.hashpw(editUserPasswordDTO.password, BCrypt.gensalt())
             }
         }
+    }
+
+    fun getUserThings(id: UUID): ArrayList<ThingDataDTO> {
+        val thingsList: ArrayList<ThingDataDTO> = arrayListOf()
+
+        transaction {
+            Things.select { Things.userId eq id }.forEach {
+                val thingDataDTO: ThingDataDTO = ThingDataDTO(UUID.randomUUID(), "")
+                thingDataDTO.id = it[Things.id]
+                thingDataDTO.name = it[Things.name]
+                thingsList.add(thingDataDTO);
+            }
+        }
+
+        return thingsList;
     }
 }

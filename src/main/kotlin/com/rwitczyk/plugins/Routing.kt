@@ -48,5 +48,11 @@ fun Application.configureRouting() {
             val userData = userService.getUserData(id);
             call.respond(HttpStatusCode.OK, userData)
         }
+
+        get("/things/{userId}") {
+            val id: UUID = UUID.fromString(call.parameters["userId"])
+            val userThings = userService.getUserThings(id);
+            call.respond(HttpStatusCode.OK, userThings)
+        }
     }
 }
